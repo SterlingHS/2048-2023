@@ -33,8 +33,27 @@ def Move_Left():
                 consecutive_zeros = 0
             # to track which index it is checking
             row_index += 1
-    print_board()
     
     return
 
+def add_value():
+    global board
+
+    zeroes_pos = []
+
+    for row in range(4):
+        for col in range(4):
+            if board[row][col] == 0:
+                zeroes_pos.append((row,col))
+    if len(zeroes_pos) == 0:
+        return
+    if(random.randint(0,9) < 9):
+        value_to_add = 2
+    else:
+        value_to_add = 4
+
+    pos_to_add = random.choice(zeroes_pos)
+    board[pos_to_add[0]][pos_to_add[1]] = value_to_add
+
 Move_Left()
+print_board()
