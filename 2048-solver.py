@@ -1,7 +1,7 @@
 import random
 
-board = [[2,0,0,0],
-         [2,0,0,0],
+board = [[2,2,2,0],
+         [0,0,0,0],
          [0,0,0,0],
          [0,0,0,0]]
 
@@ -65,6 +65,8 @@ def Move(dir):
                                 row[row_index - consecutive_test + consecutive_zeros] = row[row_index - consecutive_test]
                                 # replace the non-zero value with zero
                                 row[row_index - consecutive_test] = 0
+                            elif (row_index != 1):
+                                break
                     except:
                         consecutive_zeros = 1
                     
@@ -170,6 +172,9 @@ def add_value():
     board[pos_to_add[0]][pos_to_add[1]] = value_to_add
 
     return
+
+# def Merge():
+    
 
 running = True
 
