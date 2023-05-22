@@ -1,7 +1,7 @@
 import random
 
 board = [[2,2,2,0],
-         [0,0,0,0],
+         [2,2,2,0],
          [0,0,0,0],
          [0,0,0,0]]
 
@@ -10,6 +10,24 @@ def print_board():
     for row in board:
         print(row)
     return True
+
+def bubble(dir):
+    Move(dir)
+    if dir == "left" or dir == "right":
+        for row in board:
+            Merge(row, dir)
+    else:
+        for col in range(4):
+            temp_list = []
+            for row2 in board:
+                    temp_list.append(row2[col])
+            
+            Merge(temp_list, dir)
+            for row3 in range(4):
+                board[row3][col] = temp_list[row3]
+
+    Move(dir)
+            
 
 def Move(dir):
     global board
@@ -72,6 +90,7 @@ def Move(dir):
                     
                     # reset consecutive zeroes
                     consecutive_zeros = 1
+            row = Merge(row, "backward")
 
         elif dir == "down":
             for col in range(4):
@@ -103,10 +122,24 @@ def Move(dir):
 
                         # reset consecutive zeroes
                         consecutive_zeros = 1
-    
+                
+                
                 for row3 in range(4):
                     board[row3][col] = temp_list[row3]
-        
+
+            for col in range(4):
+                temp_list = []
+                consecutive_zeros = 0
+                # create a temporary list of all the values in a column
+                for row2 in board:
+                    temp_list.append(row2[col])
+
+                temp_list = Merge(temp_list, "forward")
+
+                for row3 in range(4):
+                    board[row3][col] = temp_list[row3]
+                
+            
         elif dir == "up":
             for col in range(4):
                 col_index = 0
@@ -173,8 +206,20 @@ def add_value():
 
     return
 
-# def Merge():
-    
+def Merge(merge_list, dir):
+    if dir == "left" or dir == "up":
+        for val in range(4):
+            if val != 3:
+                if merge_list[val] == merge_list[val + 1]:
+                    merge_list[val] *= 2
+                    merge_list[val + 1] = 0
+    elif dir == "right" or dir == "down":
+        for val in range(3, -1 , -1):
+            if val != 0:
+                if merge_list[val] == merge_list[val - 1]:
+                    merge_list[val] *= 2
+                    merge_list[val - 1] = 0
+    return merge_list
 
 running = True
 
@@ -182,12 +227,12 @@ while True:
 
     dir = input("Enter w, a, s, or d: ")
     if dir == "w":
-        Move("up")
+        bubble("up")
     elif dir == "a":
-        Move("left")
+        bubble("left")
     elif dir == "d":
-        Move("right")
+        bubble("right")
     else:
-        Move("down")
+        bubble("down")
 
     print_board()
