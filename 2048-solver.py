@@ -1,7 +1,7 @@
 import random
 
-board = [[0,2,0,2],
-         [0,0,0,0],
+board = [[2,0,0,0],
+         [2,0,0,0],
          [0,0,0,0],
          [0,0,0,0]]
 
@@ -30,14 +30,18 @@ def Move(dir):
                     row[row_index - consecutive_zeros] = row[row_index]
                     # replace the non-zero value with zero
                     row[row_index] = 0
+                    
                     try:
-                        if row[row_index + 1] != 0:
-                            # shift the non-zero value to the left
-                            row[row_index + 1 - consecutive_zeros] = row[row_index + 1]
-                            # replace the non-zero value with zero
-                            row[row_index + 1] = 0
+                        for consecutive_test in range(4 - row_index):
+                            if row[row_index + consecutive_test] != 0:
+                                # shift the non-zero value to the left
+                                row[row_index + consecutive_test - consecutive_zeros] = row[row_index + consecutive_test]
+                                # replace the non-zero value with zero
+                                row[row_index + consecutive_test] = 0
+                            elif (row_index != 2):
+                                break
                     except:
-                        consecutive_zeros = 0
+                        consecutive_zeros = 1
                     
                     # reset consecutive zeroes
                     consecutive_zeros = 1
@@ -53,15 +57,17 @@ def Move(dir):
                     row[row_index + consecutive_zeros] = row[row_index]
                     # replace the non-zero value with zero
                     row[row_index] = 0
+                
                     try:
-                        if row[row_index - 1] != 0:
-                            # shift the non-zero value to the right
-                            row[row_index - 1 + consecutive_zeros] = row[row_index - 1]
-                            # replace the non-zero value with zero
-                            row[row_index - 1] = 0
+                        for consecutive_test in range(row_index + 1):
+                            if row[row_index - consecutive_test] != 0:
+                                # shift the non-zero value to the right
+                                row[row_index - consecutive_test + consecutive_zeros] = row[row_index - consecutive_test]
+                                # replace the non-zero value with zero
+                                row[row_index - consecutive_test] = 0
                     except:
-                        consecutive_zeros = 0
-
+                        consecutive_zeros = 1
+                    
                     # reset consecutive zeroes
                     consecutive_zeros = 1
 
@@ -84,11 +90,14 @@ def Move(dir):
                         # replace the non-zero value with zero
                         temp_list[col_index] = 0
 
-                        if temp_list[col_index - 1] != 0:
-                            # shift the non-zero value to the right in temp list
-                            temp_list[col_index - 1 + consecutive_zeros] = temp_list[col_index - 1]
-                            # replace the non-zero value with zero
-                            temp_list[col_index - 1] = 0
+                        for consecutive_test in range(col_index - 1):
+                            if temp_list[col_index - consecutive_test] != 0:
+                                # shift the non-zero value to the right in temp list
+                                temp_list[col_index - consecutive_test + consecutive_zeros] = temp_list[col_index - consecutive_test]
+                                # replace the non-zero value with zero
+                                temp_list[col_index - consecutive_test] = 0
+                            else:
+                                break
 
                         # reset consecutive zeroes
                         consecutive_zeros = 1
@@ -117,11 +126,14 @@ def Move(dir):
                         # replace the non-zero value with zero
                         temp_list[col_index] = 0
                         try:
-                            if temp_list[col_index + 1] != 0:
-                                # shift the non-zero value to the left in temp list
-                                row[col_index + 1 - consecutive_zeros] = row[col_index + 1]
-                                # replace the non-zero value with zero
-                                row[col_index + 1] = 0
+                            for consecutive_test in range(4 - col_index):
+                                if temp_list[col_index + consecutive_test] != 0:
+                                    # shift the non-zero value to the left in temp list
+                                    row[col_index + consecutive_test - consecutive_zeros] = row[col_index + consecutive_test]
+                                    # replace the non-zero value with zero
+                                    row[col_index + consecutive_test] = 0
+                                else:
+                                    break
                         except:
                             consecutive_zeros = 0
 
@@ -161,14 +173,16 @@ def add_value():
 
 running = True
 
-while running == True:
-    cmd = input()
-    if cmd == "w":
+while True:
+
+    dir = input("Enter w, a, s, or d: ")
+    if dir == "w":
         Move("up")
-    elif cmd == "s":
-        Move("down")
-    elif cmd == "a":
+    elif dir == "a":
         Move("left")
-    elif cmd == "d":
+    elif dir == "d":
         Move("right")
+    else:
+        Move("down")
+
     print_board()
