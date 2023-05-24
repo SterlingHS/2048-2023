@@ -1,4 +1,5 @@
 import random
+import math
 
 board = [[0,0,0,0],
          [0,0,0,0],
@@ -17,7 +18,7 @@ def bubble(dir, simulation):
           [0,0,0,0],
           [0,0,0,0]]
     bd = Move(dir, simulation, bd)
-    if dir == "left" or dir == "right":
+    if dir == "a" or dir == "d":
         for row in bd:
             Merge(row, dir)
     else:
@@ -46,14 +47,13 @@ def Move(dir, simulation, bd):
         for row in range(4):
                 for col in range(4):
                     bd[row][col] = board[row][col]
-
     # iterate through each row
     for row in bd:
         # reset vars for each row
         consecutive_zeros = 0
 
         # iterate through each value in the row
-        if dir == "left":
+        if dir == "a":
             for row_index in range(4):
                 # count zeroes in a row
                 if row[row_index] == 0:
@@ -80,7 +80,7 @@ def Move(dir, simulation, bd):
                     # reset consecutive zeroes
                     consecutive_zeros = 1
 
-        elif dir == "right":
+        elif dir == "d":
             for row_index in range(3,-1,-1):
                 # count zeroes in a row
                 if row[row_index] == 0:
@@ -108,7 +108,7 @@ def Move(dir, simulation, bd):
                     consecutive_zeros = 1
             row = Merge(row, "backward")
 
-        elif dir == "down":
+        elif dir == "s":
             for col in range(4):
                 temp_list = []
                 consecutive_zeros = 0
@@ -156,7 +156,7 @@ def Move(dir, simulation, bd):
                     bd[row3][col] = temp_list[row3]
                 
             
-        elif dir == "up":
+        elif dir == "w":
             for col in range(4):
                 col_index = 0
                 temp_list = []
@@ -228,48 +228,102 @@ def add_value():
     return
 
 def Merge(merge_list, dir):
-    if dir == "left" or dir == "up":
-        for val in range(4):
-            if val != 3:
-                if merge_list[val] == merge_list[val + 1]:
-                    merge_list[val] *= 2
-                    merge_list[val + 1] = 0
-    elif dir == "right" or dir == "down":
-        for val in range(3, -1 , -1):
-            if val != 0:
-                if merge_list[val] == merge_list[val - 1]:
-                    merge_list[val] *= 2
-                    merge_list[val - 1] = 0
+    if dir == "a" or dir == "w":
+        for val in range(3):
+            if merge_list[val] == merge_list[val + 1]:
+                merge_list[val] *= 2
+                merge_list[val + 1] = 0
+    elif dir == "d" or dir == "s":
+        for val in range(3, 0 , -1):
+            if merge_list[val] == merge_list[val - 1]:
+                merge_list[val] *= 2
+                merge_list[val - 1] = 0
     return merge_list
 
 def check_moves():
-    bd2 = board
     moves = []
-    if bubble("up", True) != bd2:
+
+    if bubble("w", True) != board:
         moves.append("w")
-    if bubble("left", True) != bd2:
+    if bubble("a", True) != board:
         moves.append("a")
-    if bubble("right", True) != bd2:
+    if bubble("d", True) != board:
         moves.append("d")
-    if bubble("down", True) != bd2:
+    if bubble("s", True) != board:
         moves.append("s")
 
     return moves
 
-running = True
+def game_over():
+    global board
+    global maxes
+
+    max_value = 0
+    for row in board:
+        if max(row) > max_value:
+            max_value = max(row)
+
+    
+    maxes[int(math.log2(max_value))] += 1
+
+    board = [[0,0,0,0],
+            [0,0,0,0],
+            [0,0,0,0],
+            [0,0,0,0]]
+    add_value()
+
+def get_percentages():
+    max_sum = sum(maxes)
+    ind = 0
+    for val in maxes:
+        if val != 0:
+            print(val / max_sum * 100, "% - ", 2**ind)
+        ind += 1
+
+        
 add_value()
+maxes = [0,0,0,0,0,0,0,0,0,0,0]
 
-while True:
+def random_strategy():
+    return random.choice(possible_moves)
 
-    dir = input("Enter w, a, s, or d: ")
-    if dir == "w":
-        bubble("up", False)
-    elif dir == "a":
-        bubble("left", False)
-    elif dir == "d":
-        bubble("right", False)
-    elif dir == "s":
-        bubble("down", False)
+def manual_play():
+    print_board()
+    return input("Enter w, a, s, or d: ")
+
+def left_down_strat():
+    global last_move
+    move_to_take = ""
+    moves = check_moves()
+    if last_move == "s" and "a" in moves and ("a" in moves or "s" in moves):
+        move_to_take = "a"
+        last_move = "a"
+    elif "s" in moves and ("a" in moves or "s" in moves):
+        move_to_take = "s"
+        last_move = "s"
+    elif "d" in moves:
+        move_to_take = "d"
+    else:
+        move_to_take = "w"
+    
+    return move_to_take
+        
+
+last_move = "s"
+times_to_play = int(input("how many times to play?"))
+
+while 1:
+    
+    possible_moves = check_moves()
+    if len(possible_moves) == 0: 
+        if times_to_play == 0:
+            get_percentages()
+            break
+        game_over()
+        times_to_play -= 1
+    else:
+        dir = left_down_strat()
+
+    bubble(dir,False)
 
     add_value()
-    print_board()
