@@ -1,9 +1,9 @@
 import random
 
-board = [[0,4,2,2],
-         [0,0,2,2],
-         [0,8,2,4],
-         [0,16,2,0]]
+board = [[0,0,0,0],
+         [0,0,0,0],
+         [0,0,0,0],
+         [0,0,0,0]]
 
 def print_board():
     global board
@@ -257,6 +257,7 @@ def check_moves():
     return moves
 
 running = True
+add_value()
 
 while True:
 
@@ -267,8 +268,8 @@ while True:
         bubble("left", False)
     elif dir == "d":
         bubble("right", False)
-    else:
+    elif dir == "s":
         bubble("down", False)
 
-    print(check_moves())
+    add_value()
     print_board()
