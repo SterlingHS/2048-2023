@@ -11,7 +11,6 @@ def print_board():
         print(row)
     return True
 
-def bubble(dir):
 def bubble(dir, simulation):
     bd = [[0,0,0,0],
           [0,0,0,0],
