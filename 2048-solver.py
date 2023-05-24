@@ -1,9 +1,9 @@
 import random
 
-board = [[2,2,2,0],
-         [2,2,2,0],
-         [0,0,0,0],
-         [0,0,0,0]]
+board = [[0,4,2,2],
+         [0,0,2,2],
+         [0,8,2,4],
+         [0,16,2,0]]
 
 def print_board():
     global board
@@ -12,27 +12,44 @@ def print_board():
     return True
 
 def bubble(dir):
-    Move(dir)
+def bubble(dir, simulation):
+    bd = [[0,0,0,0],
+          [0,0,0,0],
+          [0,0,0,0],
+          [0,0,0,0]]
+    bd = Move(dir, simulation, bd)
     if dir == "left" or dir == "right":
-        for row in board:
+        for row in bd:
             Merge(row, dir)
     else:
         for col in range(4):
             temp_list = []
-            for row2 in board:
+            for row2 in bd:
                     temp_list.append(row2[col])
             
-            Merge(temp_list, dir)
+            temp_list = Merge(temp_list, dir)
             for row3 in range(4):
-                board[row3][col] = temp_list[row3]
+                bd[row3][col] = temp_list[row3]
 
-    Move(dir)
+    bd = Move(dir, simulation, bd)
+
+    if not simulation:
+        for row in range(4):
+            for col in range(4):
+                board[row][col] = bd[row][col]
+
+    return bd
             
 
-def Move(dir):
+def Move(dir, simulation, bd):
     global board
+    if bd == [[0,0,0,0], [0,0,0,0], [0,0,0,0], [0,0,0,0]]:
+        for row in range(4):
+                for col in range(4):
+                    bd[row][col] = board[row][col]
+
     # iterate through each row
-    for row in board:
+    for row in bd:
         # reset vars for each row
         consecutive_zeros = 0
 
@@ -97,7 +114,7 @@ def Move(dir):
                 temp_list = []
                 consecutive_zeros = 0
                 # create a temporary list of all the values in a column
-                for row2 in board:
+                for row2 in bd:
                     temp_list.append(row2[col])
 
                 for col_index in range(3,-1,-1):
@@ -125,19 +142,19 @@ def Move(dir):
                 
                 
                 for row3 in range(4):
-                    board[row3][col] = temp_list[row3]
+                    bd[row3][col] = temp_list[row3]
 
             for col in range(4):
                 temp_list = []
                 consecutive_zeros = 0
                 # create a temporary list of all the values in a column
-                for row2 in board:
+                for row2 in bd:
                     temp_list.append(row2[col])
 
                 temp_list = Merge(temp_list, "forward")
 
                 for row3 in range(4):
-                    board[row3][col] = temp_list[row3]
+                    bd[row3][col] = temp_list[row3]
                 
             
         elif dir == "up":
@@ -147,7 +164,7 @@ def Move(dir):
                 consecutive_zeros = 0
 
                 # create a temporary list of all the values in a column
-                for row2 in board:
+                for row2 in bd:
                     temp_list.append(row2[col])
 
                 for col_index in range(4):
@@ -181,9 +198,14 @@ def Move(dir):
 
                 
                 for row3 in range(4):
-                    board[row3][col] = temp_list[row3]
-    
-    return
+                    bd[row3][col] = temp_list[row3]
+
+    if simulation == False:
+        for row in range(4):
+            for col in range(4):
+                board[row][col] = bd[row][col]
+                
+    return bd
 
 def add_value():
     global board
@@ -221,18 +243,33 @@ def Merge(merge_list, dir):
                     merge_list[val - 1] = 0
     return merge_list
 
+def check_moves():
+    bd2 = board
+    moves = []
+    if bubble("up", True) != bd2:
+        moves.append("w")
+    if bubble("left", True) != bd2:
+        moves.append("a")
+    if bubble("right", True) != bd2:
+        moves.append("d")
+    if bubble("down", True) != bd2:
+        moves.append("s")
+
+    return moves
+
 running = True
 
 while True:
 
     dir = input("Enter w, a, s, or d: ")
     if dir == "w":
-        bubble("up")
+        bubble("up", False)
     elif dir == "a":
-        bubble("left")
+        bubble("left", False)
     elif dir == "d":
-        bubble("right")
+        bubble("right", False)
     else:
-        bubble("down")
+        bubble("down", False)
 
+    print(check_moves())
     print_board()
