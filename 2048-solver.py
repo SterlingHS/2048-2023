@@ -206,7 +206,7 @@ def Move(dir, simulation, bd):
                 
     return bd
 
-def add_value():
+def add_random():
     global board
 
     zeroes_pos = []
@@ -270,7 +270,7 @@ def game_over():
             [0,0,0,0],
             [0,0,0,0],
             [0,0,0,0]]
-    add_value()
+    add_random()
 
 def get_percentages():
     max_sum = sum(maxes)
@@ -280,9 +280,8 @@ def get_percentages():
             print(val / max_sum * 100, "% - ", 2**ind)
         ind += 1
 
-        
-add_value()
-maxes = [0,0,0,0,0,0,0,0,0,0,0]
+    
+maxes = [0,0,0,0,0,0,0,0,0,0,0,0,0]
 
 def random_strategy():
     return random.choice(possible_moves)
@@ -307,10 +306,161 @@ def left_down_strat():
         move_to_take = "w"
     
     return move_to_take
+
+def simulate_scores_strat():
+    left_score = 0
+    right_score = 0
+    up_score = 0
+    down_score = 0
+    scores = [left_score, right_score, up_score, down_score]
+    left_merges = 0
+    right_merges = 0
+    up_merges = 0
+    down_merges = 0
+    left_zeroes = 0
+    right_zeroes = 0
+    up_zeroes = 0
+    down_zeroes = 0
+    left_sum = 0
+    right_sum = 0
+    up_sum = 0
+    down_sum = 0
+    
+
+    for row in range(4):
+        last_match = 0
+        for val in range(3,-1,-1):
+            if board[row][val] == board[row][val - 1] and last_match == 0:
+                right_merges += 1
+                last_match = 1     
+            elif last_match != 0:
+                last_match = 0
+
+        last_match = 0
+        for val in range(3):
+            if board[row][val] == board[row][val + 1] and last_match == 0:
+                left_merges += 1
+                last_match = 1     
+            elif last_match != 0:
+                last_match = 0 
+
+        temp_list = []
+        for row2 in range(4):
+            temp_list.append(board[row][row2])
+
+        last_match = 0
+        for val in range(3,-1,-1):
+            if temp_list[val] == temp_list[val - 1] and last_match == 0:
+                down_merges += 1
+                last_match = 1     
+            elif last_match != 0:
+                last_match = 0
         
+        last_match = 0
+        for val in range(3):
+            if temp_list[val] == temp_list[val + 1] and last_match == 0:
+                up_merges += 1
+                last_match = 1     
+            elif last_match != 0:
+                last_match = 0
+    
+    for row in Move("d",True,board):
+        right_corner = 0
+        right_max_block = 0
+        if max(row) > right_max_block:
+            right_max_block = max(row)
+        if row.index(right_max_block) == 3 or 0:
+            right_corner = 1
+        for val in range(4):
+            if row[val] == 0:
+                right_zeroes += 1
+            right_sum += row[val]
+        
+    for row in Move("w",True,board):
+        up_corner = 0
+        up_max_block = 0
+        if max(row) > up_max_block:
+            up_max_block = max(row)
+        if row.index(up_max_block) == 3 or 0:
+            up_corner = 1
+
+        for val in range(4):
+            if row[val] == 0:
+                up_zeroes += 1
+            up_sum += row[val]
+    for row in Move("s",True,board):
+        down_corner = 0
+        down_max_block = 0
+        for row2 in range(4):
+            if max(row) > down_max_block:
+                down_max_block = max(row)
+        if row.index(down_max_block) == 3 or 0:
+            down_corner = 1
+
+        for val in range(4):
+            if row[val] == 0:
+                down_zeroes += 1
+            down_sum += row[val]
+
+    for row in Move("a",True,board):
+        left_corner = 0
+        left_max_block = 0
+        if max(row) > left_max_block:
+            left_max_block = max(row)
+        if row.index(left_max_block) == 3 or 0:
+            left_corner = 1
+
+        # temp_list = []
+        # for val in range(4):
+        #     if row[val] == row[val + 1]:
+        #         future_merges_left += 1
+            # temp_list.append(board[row][val])
+
+            
+
+        for val in range(4):
+            if row[val] == 0:
+                left_zeroes += 1
+            left_sum += row[val]
+
+    zeroes_weight = 0.5
+    sum_weight = 0.1
+    merge_weight = 1
+    corner_weight = 10
+
+    left_score = (left_merges * merge_weight) + (left_zeroes * zeroes_weight) + (left_sum * sum_weight) + (left_corner * corner_weight)
+    right_score = (right_merges * merge_weight) + (right_zeroes * zeroes_weight) + (right_sum * sum_weight) + (right_corner * corner_weight)
+    up_score = (up_merges * merge_weight) + (up_zeroes * zeroes_weight) + (up_sum * sum_weight) + (up_corner * corner_weight)
+    down_score = (down_merges * merge_weight) + (down_zeroes * zeroes_weight) + (down_sum * sum_weight) + (down_corner * corner_weight)
+
+    max_score = max(scores)
+    ind = 0
+    inputs = ["a","d","w","s"]
+    actions = []
+    
+    for score in scores:
+        if score == max_score:
+            actions.append(inputs[ind])
+        ind += 1
+    if len(actions) != 4:
+        to_return = random.choice(actions)
+    else:
+        to_return = left_down_strat()
+
+    return to_return
+
+def start_game():
+    global board
+    board = [[0,0,0,0],
+            [0,0,0,0],
+            [0,0,0,0],
+            [0,0,0,0]]
+    add_random()
+    add_random()
 
 last_move = "s"
 times_to_play = int(input("how many times to play?"))
+start_game()
 
 while 1:
     
@@ -322,8 +472,10 @@ while 1:
         game_over()
         times_to_play -= 1
     else:
-        dir = left_down_strat()
+        # print_board()
+        # print("")
+        dir = simulate_scores_strat()
 
     bubble(dir,False)
 
-    add_value()
+    add_random()
